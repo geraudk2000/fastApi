@@ -18,6 +18,12 @@ class Post(BaseModel):
 my_posts = [{"title": "title of posts 1", "content": "content of post 1", "id" : 1},
             {"title": "favorite foods", "content": "I like pizza", "id" : 2}]
 
+def find_post(id):
+    for post in my_posts:
+        if post['id'] == id:
+            return post
+    return None
+
 @app.get("/")
 def root():
     return {"message": "Welcome to my api"}
@@ -35,3 +41,14 @@ def create_posts(posts: Post):
     my_posts.append(post_dict)
     return {"data": my_posts}
 # title str, content str,
+
+@app.get("/posts/latest")
+def get_latest_post():
+    latest_post = my_posts[len(my_posts) - 1]
+    return {"detail": latest_post}
+
+@app.get("/posts/{id}")
+def get_post(id: int):
+    post = find_post(id)
+    return {"post_detail": post}
+
