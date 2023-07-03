@@ -24,6 +24,12 @@ def find_post(id):
             return post
     return None
 
+def find_index_post(id):
+    for index, post in enumerate(my_posts):
+        if post['id'] == id:
+            return index
+
+
 @app.get("/")
 def root():
     return {"message": "Welcome to my api"}
@@ -56,3 +62,9 @@ def get_post(id: int, response: Response):
         
     return {"post_detail": post}
 
+@app.delete("/posts/{id}")
+def delete_post(id: int):
+    #find the index in the array that has required ID
+    index = find_index_post(id)
+    my_posts.pop(index)
+    return {"message": f"post {id} was succesfuly deleted"}
