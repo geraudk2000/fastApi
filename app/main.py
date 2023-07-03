@@ -62,9 +62,23 @@ def get_post(id: int, response: Response):
         
     return {"post_detail": post}
 
-@app.delete("/posts/{id}")
+@app.delete("/posts/{id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_post(id: int):
     #find the index in the array that has required ID
     index = find_index_post(id)
+    if not index:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail=f"post with {id} was not found")
     my_posts.pop(index)
-    return {"message": f"post {id} was succesfuly deleted"}
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+@app.put("/post/{id}")
+def update_post(id: int, post: Post):
+    index = find_index_post(id)
+    if not index:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, 
+                        detail=f"post with {id} was not found")
+    post_dict = post.dict()
+    post_dict['id'] = id
+    my_posts[index] = post_dict
+    return {"data": post_dict}
