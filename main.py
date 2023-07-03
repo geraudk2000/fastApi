@@ -1,6 +1,9 @@
 from fastapi import FastAPI
 from fastapi import Body
 from pydantic import BaseModel
+from typing import Optional
+from random import randint
+
 
 app = FastAPI()
 
@@ -9,7 +12,11 @@ class Post(BaseModel):
     title: str
     content: str
     published: bool = True
+    rating: Optional[int] = None 
 
+
+my_posts = [{"title": "title of posts 1", "content": "content of post 1", "id" : 1},
+            {"title": "favorite foods", "content": "I like pizza", "id" : 2}]
 
 @app.get("/")
 def root():
@@ -18,11 +25,13 @@ def root():
 
 @app.get("/posts")
 def get_posts():
-    return {"data": "This is your posts"}
+    return {"data": my_posts}
 
 
-@app.post("/createposts")
-def create_posts(new_post: Post):
-    print(new_post.title)
-    return {"data": new_post}
+@app.post("/posts")
+def create_posts(posts: Post):
+    post_dict = posts.dict()
+    post_dict['id'] = randint(0, 10000000)
+    my_posts.append(post_dict)
+    return {"data": my_posts}
 # title str, content str,
