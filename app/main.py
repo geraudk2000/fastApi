@@ -63,10 +63,11 @@ def get_posts():
 
 @app.post("/posts", status_code=status.HTTP_201_CREATED)
 def create_posts(posts: Post):
-    post_dict = posts.dict()
-    post_dict['id'] = randint(0, 10000000)
-    my_posts.append(post_dict)
-    return {"data": my_posts}
+    cursor.execute(""" INSERT INTO posts (title, content, published) VALUES (%s, %s, %s) RETURNING * """, 
+                   (posts.title, posts.content, posts.published))
+    new_post = cursor.fetchone()
+    conn.commit()
+    return {"data": new_post}
 # title str, content str,
 
 @app.get("/posts/latest")
