@@ -79,7 +79,6 @@ def get_latest_post():
 def get_post(id: int, response: Response):
     cursor.execute(""" SELECT * FROM posts WHERE id = %s """, (str(id)))
     post = cursor.fetchone()
-
     if not post:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, 
                             detail=f"post with {id} was not found")
@@ -88,9 +87,12 @@ def get_post(id: int, response: Response):
 
 @app.delete("/posts/{id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_post(id: int):
+    cursor.execute(""" DELETE FROM posts WHERE id = %s RETURNING * """, (str(id)))
+    delete_post = cursor.fetchone()
+    conn.commit()
     #find the index in the array that has required ID
     index = find_index_post(id)
-    if not index:
+    if not delete_post:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail=f"post with {id} was not found")
     my_posts.pop(index)
