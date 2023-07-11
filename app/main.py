@@ -59,23 +59,30 @@ def find_index_post(id):
 def root():
     return {"message": "Welcome to my api"}
 
-@app.get("/sqlachamy")
+@app.get("/sqlalchemy")
 def test_posts(db: Session = Depends(get_db)):
-    return {"status": "success"}
+    posts = db.query(models.Post).all()
+    return {"data": posts}
 
 @app.get("/posts")
-def get_posts():
-    cursor.execute(""" SELECT * FROM posts """)
-    posts = cursor.fetchall()
+def get_posts(db: Session = Depends(get_db)):
+    # cursor.execute(""" SELECT * FROM posts """)
+    # posts = cursor.fetchall()
+    posts = db.query(models.Post).all()
     return {"data": posts}
 
 
 @app.post("/posts", status_code=status.HTTP_201_CREATED)
-def create_posts(posts: Post):
-    cursor.execute(""" INSERT INTO posts (title, content, published) VALUES (%s, %s, %s) RETURNING * """, 
-                   (posts.title, posts.content, posts.published))
-    new_post = cursor.fetchone()
-    conn.commit()
+def create_posts(posts: Post, db: Session = Depends(get_db)):
+    # cursor.execute(""" INSERT INTO posts (title, content, published) VALUES (%s, %s, %s) RETURNING * """, 
+    #                (posts.title, posts.content, posts.published))
+    # new_post = cursor.fetchone()
+    # conn.commit()
+
+    new_post = models.Post(title=posts.title, content=posts.content, published=posts.published)
+    db.add(new_post)
+    db.commit()
+    db.refresh(new_post)
     return {"data": new_post}
 # title str, content str,
 
