@@ -1,10 +1,10 @@
+import os
+import time
 from fastapi import FastAPI, Response, status, HTTPException
 from fastapi.params import Body
 from pydantic import BaseModel
 from typing import Optional
 from random import randint
-import os
-import time
 import psycopg2
 from psycopg2.extras import RealDictCursor
 
@@ -87,7 +87,7 @@ def get_post(id: int, response: Response):
 
 @app.delete("/posts/{id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_post(id: int):
-    cursor.execute(""" DELETE FROM posts WHERE id = %s RETURNING * """, (str(id)))
+    cursor.execute(""" DELETE FROM posts WHERE id = %s RETURNING * """, (str(id),))
     delete_post = cursor.fetchone()
     conn.commit()
     #find the index in the array that has required ID
