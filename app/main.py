@@ -114,14 +114,18 @@ def update_post(id: int, updated_post: Post, db: Session = Depends(get_db)):
     
     # updated_post = cursor.fetchone()
     # conn.commit()
+
+    # Query to find a specific id
     post_query = db.query(models.Post).filter(models.Post.id == id)
 
+    # grab that specific post
     post = post_query.first()
     
     if not post:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, 
                         detail=f"post with {id} was not found")
     
+    # update the post
     post_query.update(updated_post.dict(), synchronize_session=False)
     db.commit()
     return {"data": post_query.first()}
