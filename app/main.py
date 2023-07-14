@@ -63,7 +63,7 @@ def create_posts(post: Post, db: Session = Depends(get_db)):
     # new_post = cursor.fetchone()
     # conn.commit()
     
-    #print(**post.dict())
+    # unpack the dictionnary
     new_post = models.Post(**post.dict())
     #print(new_post)
    
