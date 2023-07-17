@@ -4,7 +4,7 @@ from fastapi import FastAPI, Response, status, HTTPException, Depends
 from fastapi.params import Body
 from typing import Optional, List
 import psycopg2
-from passlib.context import CryptContext
+from . import utils
 from sqlalchemy.orm import Session
 from psycopg2.extras import RealDictCursor
 from . import models, schemas
@@ -13,7 +13,7 @@ from .database import engine, get_db
 
 DB_PASSWORD = os.getenv('DB_PASSOWRD')
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
 models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
@@ -124,7 +124,7 @@ def create_users(user: schemas.UserCreate, db: Session = Depends(get_db)):
     
     #Create the hash of passowrd 
 
-    hashed_password = pwd_context.hash(user.password)
+    hashed_password = utils.hash(user.password)
     user.password = hashed_password
     new_user = models.User(**user.dict())
     db.add(new_user)
@@ -133,4 +133,12 @@ def create_users(user: schemas.UserCreate, db: Session = Depends(get_db)):
     
     return new_user
     
+@app.get("/users/{id}", response_model=schemas.userOut)
+def get_user(id : int, db: Session = Depends(get_db)):
+    user = db.query(models.User).filter(models.User.id == id).first()
+
+    if not user:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"User with id :  {id} does not found")
+    
+    return user
     

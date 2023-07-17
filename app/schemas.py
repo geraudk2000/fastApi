@@ -26,6 +26,7 @@ class UserCreate(BaseModel):
 class userOut(BaseModel):
     id: int
     email : EmailStr
+    create_at: datetime
 
     class Config:
         orm_mode = True
