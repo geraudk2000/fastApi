@@ -3,7 +3,6 @@ import time
 from fastapi import FastAPI, Response, status, HTTPException, Depends
 from fastapi.params import Body
 from typing import Optional, List
-from random import randint
 import psycopg2
 from sqlalchemy.orm import Session
 from psycopg2.extras import RealDictCursor
