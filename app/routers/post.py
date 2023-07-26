@@ -48,9 +48,9 @@ def get_post(id: int, db: Session = Depends(get_db),
     post = db.query(models.Post).filter(models.Post.id == id).first() 
 
     if not post:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, 
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail=f"post with {id} was not found")
-        
+    
     return post
 
 @router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
