@@ -27,7 +27,7 @@ def create_posts(post: schemas.PostCreate, db: Session = Depends(get_db),
     # conn.commit()
     print(current_user.email)
     # unpack the dictionnary
-    new_post = models.Post(**post.dict())
+    new_post = models.Post(owner_id=current_user.id, **post.dict())
     #print(new_post)
    
     #new_post = models.Post(**post.dict())
@@ -61,13 +61,17 @@ def delete_post(id: int, db: Session = Depends(get_db),
     # conn.commit()
     #find the index in the array that has required ID
 
-    post = db.query(models.Post).filter(models.Post.id == id)
+    post_query = db.query(models.Post).filter(models.Post.id == id)
+    post = post_query.first()
 
-    
-    if not post.first():
+
+    if not post:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail=f"post with {id} was not found")
-    post.delete(synchronize_session=False)
+    if post.owner_id != current_user.id:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, 
+                            detail="Not authorized to perfom requested action")
+    post_query.delete(synchronize_session=False)
     db.commit()
     
     return Response(status_code=status.HTTP_204_NO_CONTENT)
@@ -91,8 +95,12 @@ def update_post(id: int, updated_post: schemas.PostCreate, db: Session = Depends
     if not post:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, 
                         detail=f"post with {id} was not found")
+    if post.owner_id != current_user.id:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
+                            detail="Not authorized to perform resquested action")
     
     # update the post
     post_query.update(updated_post.dict(), synchronize_session=False)
     db.commit()
+    
     return post_query.first()
