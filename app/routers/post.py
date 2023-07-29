@@ -44,8 +44,8 @@ def create_posts(post: schemas.PostCreate, db: Session = Depends(get_db),
     return new_post
 # title str, content str,
 
-@router.get("/{id}", response_model=schemas.PostOut)
-#@router.get("/{id}")
+#@router.get("/{id}", response_model=schemas.PostOut)
+@router.get("/{id}")
 def get_post(id: int, db: Session = Depends(get_db), 
              current_user: int = Depends(oauth2.get_current_user)):
     # cursor.execute(""" SELECT * FROM posts WHERE id = %s """, (str(id)))
@@ -55,11 +55,10 @@ def get_post(id: int, db: Session = Depends(get_db),
         models.Vote, models.Vote.post_id == models.Post.id, isouter=True).group_by(models.Post.id).all()
 
     post = list(map(lambda x:x._mapping,post))
-    print(type(post))
-    #post = list(map(lambda x:x._mapping,post))
-    # if not post:
-    #     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
-    #                         detail=f"post with {id} was not found")
+    
+    if id != post[0]["Post"].id :
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail=f"post with {id} was not found")
     
     return post[0]
 
