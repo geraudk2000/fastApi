@@ -10,4 +10,10 @@ def test_add(num1, num2, expected):
     print("testing add function")
     assert add(num1, num2) == expected
 
-#test_add()
+@pytest.mark.parametrize("num1, num2, expected", [
+    (5, 1, 4),
+    (8, -1, 9),
+    (12, 2, 10)
+])
+def test_subtract(num1, num2, expected):
+    assert subtract(num1, num2) == expected
