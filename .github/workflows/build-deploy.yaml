@@ -1,0 +1,10 @@
+name: Build and Deploy Code
+
+on: [push]
+
+jobs:
+  job1: 
+    runs-on: ubuntu-20.04
+
+    steps:
+      - name: pull
