@@ -2,9 +2,7 @@ name: Build and Deploy Code
 
 on: [push]
 
-jobs:
-  job1: 
-    env:
+env:
       DATABASE_HOSTNAME: ${{secrets.DATABASE_HOSTNAME}}
       DATABASE_PORT: ${{secrets.DATABASE_PORT}}
       DATABASE_PASSWORD: ${{secrets.DATABASE_PASSWORD}}
@@ -13,7 +11,10 @@ jobs:
       SECRET_KEY: ${{secrets.SECRET_KEY}}
       ALGORITHM: ${{secrets.ALGORITHM}}
       ACCESS_TOKEN_EXPIRE_MINUTES: ${{secrets.ACCESS_TOKEN_EXPIRE_MINUTES}}   
-    
+
+
+jobs:
+  build:     
     services:
       postgres:
         image: postgres
@@ -68,3 +69,21 @@ jobs:
           cache-to: type=local,dest=/tmp/.buildx-cache
       - name: Image digest
         run: echo ${{ steps.docker_build.outputs.digest }}
+
+
+  # deploy:
+  #   runs-on: ubuntu-latest
+  #   needs: [build]
+  #   environment:
+  #     name: production
+  #   steps:
+  #     - name: deploy to ubuntu server
+  #       uses: appleboy/ssh-action@master
+  #       with:
+  #         host: ${{secrets.PROD_HOST}}
+  #         username: ${{secrets.PROD_USERNAME}}
+  #         password: ${{secrets.PROD_PASSWORD}}
+  #         script: |
+  #           cd app/src
+  #           git pull
+  #           echo ${{secrets.PROD_PASSWORD}} | sudo -S systemctl restart api
